@@ -5,12 +5,14 @@ from functools import wraps
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
-        token = request.args.get('token')
+        token = request.headers.get('Authorization').split(' ')[1]
+        print(request.headers)
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            print(token)
+            data = jwt.decode(token, 'KEEP_IT_A_SECRET', algorithms=['HS256'])
         except:
             return jsonify({'message': 'Invalid token'}), 403
 

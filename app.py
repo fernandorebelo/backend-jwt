@@ -3,9 +3,11 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 from utils.wrapper import token_required
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'KEEP_IT_A_SECRET'
+CORS(app)
 
 @app.route('/public')
 def public():
@@ -25,10 +27,12 @@ def login():
     if user_name == 'admin' and user_password == '123456':
         token = jwt.encode({
             'user': user_name,
-            'expiration': str(datetime.utcnow() + timedelta(minutes=50))
-        }, app.config['SECRET_KEY'])
+            'expiration': str(datetime.utcnow() + timedelta(minutes=50)),
+            'user_email': 'admin@admin.com',
+            'user_phone': '111111111'
+        }, 'KEEP_IT_A_SECRET', algorithm='HS256')
 
-        return jsonify({'token': token})
+        return jsonify({'token': token, 'username': user_name, 'email': 'admin@admin.com', 'phone': '111111111'})
     else:
         return jsonify({'message': 'Invalid credentials'})
 
